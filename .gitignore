@@ -25,3 +25,7 @@ pyflow/
 air-400/data/
 air-400/cache/
 air-400/output/
+
+Infant-Pose-Estimation/debug*/
+Infant-Pose-Estimation/*.jpg
+Infant-Pose-Estimation/*.png
