@@ -20,5 +20,8 @@ pyflow/
 
 *test*.py
 
-processors/
+/processors/
 
+air-400/data/
+air-400/cache/
+air-400/output/
