@@ -1,0 +1,111 @@
+NAME: efficientphys_pose_glsa_option_b_debug
+
+CV:
+  ENABLE_CV: False
+
+DATA_PATH:
+  AIR_125: "/users/3/jian1105/Video-Based_Infant_Respiration_Estimation/air-400/data/AIR_125"
+  AIR_400: "/users/3/jian1105/Video-Based_Infant_Respiration_Estimation/air-400/data"
+  COHFACE: "/users/3/jian1105/Video-Based_Infant_Respiration_Estimation/air-400/data/COHFACE"
+
+  CACHE_DIR: "/users/3/jian1105/Video-Based_Infant_Respiration_Estimation/air-400/cache_pose_glsa_debug"
+  OUTPUT_DIR: "/users/3/jian1105/Video-Based_Infant_Respiration_Estimation/air-400/output"
+
+  BODY_DETECTOR_PATH: "/users/3/jian1105/Video-Based_Infant_Respiration_Estimation/air-400/data/ROI Detectors/yolov8m.pt"
+  FACE_DETECTOR_PATH: "/users/3/jian1105/Video-Based_Infant_Respiration_Estimation/air-400/data/ROI Detectors/yolov8n-face.pt"
+
+TRAIN:
+  BATCH_SIZE: 2
+  EPOCHES: 1
+  LR: 1e-3
+
+  DATA:
+    - DATASET: AIR_400
+      SPLIT_TYPE: custom
+      SPLIT_SUBJECTS: ['S01']
+      SPLIT_RATIO: 0.0
+
+      DATA_FORMAT: &common_data_format NDCHW
+
+      PREPROCESS: &common_preprocess
+        DO_DOWNSAMPLE_BEFORE_PREPROCESS: True
+        DOWNSAMPLE_SIZE_BEFORE_PREPROCESS: [320, 180]
+
+        DATA_NORMALIZE_TYPE: Standardized
+        LABEL_NORMALIZE_TYPE: DiffNormalized
+        FLOW_NORMALIZE_TYPE: Standardized
+
+        DO_CHUNK: True
+        CHUNK_LENGTH: 180
+
+        DO_CROP_INFANT_REGION: True
+        DYNAMIC_DETECTION: True
+        DYNAMIC_DETECTION_FREQUENCY: 30
+
+        INFANT_REGION: Body
+
+        BODY_CONF_THRESHOLD: 0.25
+        FACE_CONF_THRESHOLD: 0.5
+        CHEST_SHIFT_ALPHA: 0.2
+
+        DO_POSE_GUIDED_GLSA: True
+
+        GLSA_GRID_SIZE: [8, 8]
+
+        GLSA_BASE_WEIGHT: 0.35
+        GLSA_TORSO_WEIGHT: 1.0
+
+        GLSA_POSE_CONF_THRESHOLD: 0.50
+
+        GLSA_POSE_FREQUENCY: 30
+
+
+        GLSA_FOUR_JOINT_PAD: 0.10
+        GLSA_SAME_SIDE_PAD: 0.15
+
+        GLSA_FALLBACK: none
+
+        POSE_REPO_PATH: "/users/3/jian1105/Video-Based_Infant_Respiration_Estimation/Infant-Pose-Estimation"
+
+        POSE_CFG_FILE: "experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml"
+
+        POSE_MODEL_PATH: "models/coco/w48_384×288.pth"
+
+        DO_OPTICAL_FLOW: True
+        OF_METHOD: coarse2fine
+
+        DO_DOWNSAMPLE_BEFORE_TRAINING: True
+        DOWNSAMPLE_SIZE_BEFORE_TRAINING: [96, 96]
+
+VALID:
+  DATA:
+    DATASET: AIR_400
+    SPLIT_TYPE: custom
+    SPLIT_SUBJECTS: ['S02']
+
+    DATA_FORMAT: *common_data_format
+    PREPROCESS: *common_preprocess
+
+TEST:
+  DATA:
+    DATASET: AIR_400
+    SPLIT_TYPE: custom
+    SPLIT_SUBJECTS: ['S03']
+
+    DATA_FORMAT: *common_data_format
+    PREPROCESS: *common_preprocess
+
+MODEL:
+  NAME: EfficientPhys
+  DROP_RATE: 0.2
+  LOSS: psd_mse
+  FRAME_DEPTH: 10
+  IN_CHANNELS: 3
+
+INFERENCE:
+  BATCH_SIZE: 4
+  EVALUATION_METHOD: FFT
+  USE_POST_PROCESS: True
+
+LOGGING:
+  USE_WANDB: False
