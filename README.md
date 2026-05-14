@@ -1,4 +1,4 @@
-# vedio_basic
+# Video Based Infant Respiration Estimation
 
 Workspace for video-based infant analysis experiments. The repository combines:
 
